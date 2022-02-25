@@ -11,30 +11,39 @@ struct HomeView: View {
     
     @State private var show = false
     
+    // Storing Current Day...
+    @State private var CurrentDay: Int = 1
+    
     var body: some View {
         NavigationView{
-            
             // Sample List...
             List{
-                ForEach(1...15, id: \.self){index in
-                    Button{
-                        withAnimation{
-                            show.toggle()
+                Section(header: Text("Tutoriall's")){
+                    ForEach(1...15, id: \.self){index in
+                        Button{
+                            withAnimation{
+                                show.toggle()
+                            }
+                        }label: {
+                            
+                            Text("Day\(index) of SwiftUI")
                         }
-                    }label: {
-                        
-                        Text("Day\(index) of SwiftUI")
-                    }
-                    .foregroundColor(.primary)
-                }// ForEach
+                        .foregroundColor(.primary)
+                    }// ForEach
+                }// Section
             }// List
             .listStyle(.insetGrouped)
             .navigationTitle("Full Swipe Pop")
         }// NavigationView
         .fullSwipePop(show: $show){
-            Color.red
-                .padding()
-        }
+            List{
+                Section(header: Text("Day \(CurrentDay)")){
+                    ForEach(1...30, id: \.self){index in
+                        Text("Course \(index)")
+                    }// ForEach
+                }// Section
+            }// List
+        }// .fullSwipePop
     }
 }
 

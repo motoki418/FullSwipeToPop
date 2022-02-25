@@ -39,31 +39,25 @@ private struct FullSwipePopHelper<MainContent: View, Content: View>: View{
     @GestureState var gestureOffset: CGFloat = 0
     @State var offset: CGFloat = 0
     
-    @Environment(\.colorScheme) var colorScheme
-    
     var body: some View{
-        
         // Geometry Reader for Getting Screen width for gesture calc...
         GeometryReader{proxy in
             mainContent
+            // Moving main Content Slightly...
+                .offset(x: show && offset >= 0 ? getOffset(size: proxy.size.width) : 0)
                 .overlay(
                     ZStack{
                         if show{
                             content
-                            // adding Bg same as Color scheme...
-                            // ダークモードがオンの場合はsafeAreaの背景色を青色に
-                            // ダークモードがオンの場合はsafeAreaの背景色を白色に
-                                .background(
-                                
-                                    (colorScheme == .dark ? Color.blue : Color.green)
-                                        .ignoresSafeArea()
-                                )
-                                .offset(x: offset)
+                            
+                            // 右から左へのスワイプを無効にする
+                                .offset(x: offset > 0 ? offset : 0)
                             // Adding Gesture...
                                 .gesture(DragGesture().updating($gestureOffset,
-                                                                body: {
-                                    value, out, _ in
+                                                                body: { value, out, _ in
                                     out = value.translation.width
+                                    print(value)
+                                    print(out)
                                 }).onEnded({ value in
                                     
                                     // Close if pass...
@@ -87,9 +81,20 @@ private struct FullSwipePopHelper<MainContent: View, Content: View>: View{
             // This is why bcx it will update only for valid touch...
                 .onChange(of: gestureOffset){ newValue in
                     offset = gestureOffset
-                }
+                }// .onChange
         }// GeometryReader
-    }//
+    }// body
+    
+    func getOffset(size: CGFloat) -> CGFloat{
+        let progress = offset / size
+        
+        // Were slighlty moving the view
+        // and getting back to 0 based on user drag...
+        let start: CGFloat = -80
+        let progressWidth = (progress * 90) <= 90 ? (progress * 90) : 90
+        
+        let mainOffset = (start + progressWidth) < 0 ? (start + progressWidth) : 0
+        
+        return mainOffset
+    }
 }
-
-// Transition is not working on preview...
